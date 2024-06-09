@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "ES2020"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "module": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "workflows/*"
+      ]
+    }
+  }
+}
