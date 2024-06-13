@@ -20,7 +20,7 @@ success-notice-aggregator (SNA) is designed to solve this problem by consolidati
 ### Architecture Overview
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph ExternalInput
         BatchSystem[Monitor Target]
     end
@@ -31,7 +31,7 @@ flowchart TD
 
     subgraph System
         subgraph InAdapters["Adapters (in)"]
-            SuccessNotificationEndpointAdapters["SuccessNotificationEndpointAdapter\n(Slack|AWS|K8s)"]
+            SuccessNotificationEndpoint["SuccessNotificationEndpoint\n(Slack|AWS|K8s)"]
             CheckSchedulerAdapters["SchedulerAdapter\n(EventBridge|Slack|Kron)"]
         end
 
@@ -55,7 +55,7 @@ flowchart TD
             end
 
             subgraph IncomingPorts["Ports (in)"]
-                SuccessNotificationEndpoint
+                SuccessNotificationReceiver
                 CheckScheduler
             end
 
@@ -66,18 +66,18 @@ flowchart TD
     end
 
     %% Data Flow
-    BatchSystem --> |Sends success notification| SuccessNotificationEndpointAdapters
-    SuccessNotificationEndpointAdapters -.-> |Implements| SuccessNotificationEndpoint
-    SuccessNotificationEndpoint --> |Publishes SuccessNotificationReceived| EventBroker
-    EventBroker --> |Subscribes to SuccessNotificationReceived| StoreService
+    BatchSystem --> |Sends success notification| SuccessNotificationEndpoint
+    SuccessNotificationEndpoint -.-> |Implements| SuccessNotificationReceiver
+    SuccessNotificationReceiver --> |SuccessNotificationReceived| EventBroker
+    StoreService --> |Subscribes| EventBroker
     StoreService --> |Delegates storing| ReceiveRecordService
     ReceiveRecordService --> |Creates| ReceiveRecord
     ReceiveRecordService --> |Delegates writing| ReceiveRecordRepository
     Config --> |Provides| SuccessNotificationEndpoint
     Config --> |Provides| StoreService
     Config --> |Provides| CheckScheduler
-    CheckScheduler --> |Publishes CheckScheduled| EventBroker
-    EventBroker --> |Subscribes to CheckScheduled| CheckService
+    CheckScheduler --> |CheckScheduled| EventBroker
+    CheckService --> |Subscribes| EventBroker
     CheckService --> |Delegates checking| ReceiveRecordService
     ReceiveRecordService --> |Delegates checking| ReceiveRecord
     ReceiveRecord --> |"Check()"| ReceiveRecord
