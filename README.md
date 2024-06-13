@@ -17,51 +17,7 @@ success-notice-aggregator (SNA) is designed to solve this problem by consolidati
 
 ## How It Works
 
-1. **Configuration**:
-   - Define expected success notifications using regex patterns
-   - Specify URLs to check in case of missing notifications
-   - Configure a schedule for regular checks
-   - Provide necessary permissions for Slack integration
-   - Specify channels for sending success messages or failure alerts
-
-2. **Event-Driven Operations**:
-   - **POST Event**: When a success notification is received, SNA converts it into a `ReceiveRecord` by assigning a unique ID. This record is then posted to the Slack Platform.
-   - **Scheduled Event**: On a defined schedule, SNA checks the arrival of all expected notifications and sends alerts if any of them are missing.
-
-3. **Identity Verification of Notification**:
-   - SNA verifies the identity of success notifications by adding a hash value generated from the following:
-     - Config file of the Slack Platform for the SNA
-     - Registered name of the target batch process
-     - Regex pattern of expected success notification for each target batch process
-   - This identity verification ensures accurate monitoring by avoiding false-positive failure alerts, especially when multiple SNAs are monitoring the same batch process. Each `ReceiveRecord` created from a success notification ensures that the same notification can be correctly identified and verified during checks.
-
-4. **Transformation and Storage**:
-   - Upon receiving a success notification, the system processes it through several stages:
-     - **Signature Verification**: Ensures the authenticity of the notification.
-     - **Injection Protection**: Safeguards against malicious content.
-     - **ID Assignment**: Assigns a unique identifier to create a `ReceiveRecord`.
-     - **Storage**: Stores the `ReceiveRecord` in the configured repository.
-
-5. **Regular Checks**:
-   - The Scheduler triggers regular checks.
-   - The system verifies the stored `ReceiveRecords` to ensure all expected notifications are present.
-   - If any notification is missing, an alert is generated and sent via Slack.
-
-## Security Considerations
-
-- **Injection Protection**: Safeguards against malicious code injections from monitored processes.
-- **Signed Notifications**: (Future Feature) Use HMAC signatures to verify the authenticity of incoming notifications.
-
-## Example Flow
-
-1. A success notification is sent from an external batch system to the `SuccessNotificationEndpoint`.
-2. The notification goes through signature verification and injection protection.
-3. An ID is assigned to the notification, converting it into a `ReceiveRecord`.
-4. The `ReceiveRecord` is stored in the repository (Slack Datastore, DynamoDB, MongoDB).
-5. The Scheduler initiates a check, and the system verifies the stored `ReceiveRecords`.
-6. If a `ReceiveRecord` is missing, an alert is sent to the specified Slack channel.
-
-## Architecture
+### Architecture Overview
 
 ```mermaid
 flowchart TD
@@ -70,21 +26,18 @@ flowchart TD
     end
     subgraph ExternalOutput
         SlackAPI[Slack API]
-        DB[("SlackDatastore
-        DynamoDB
-        MongoDB
-        ")]
+        DB[("SlackDatastore\nDynamoDB\nMongoDB\n")]
     end
 
     subgraph System
         subgraph InAdapters["Adapters (in)"]
-            EventListeners["EventListenerAdapter (Slack|AWS|K8s)"]
-            CheckSchedulerAdapters["SchedulerAdapter (EventBridge|Slack|Kron)"]
+            SuccessNotificationEndpointAdapters["SuccessNotificationEndpointAdapter\n(Slack|AWS|K8s)"]
+            CheckSchedulerAdapters["SchedulerAdapter\n(EventBridge|Slack|Kron)"]
         end
 
         subgraph OutAdapters["Adapters (out)"]
             SlackNotifierAdapter
-            DbAdapters["DbAdapter (Slack Datastore|DynamoDb|MongoDb)"]
+            DbAdapters["DbAdapter\n(Slack Datastore|DynamoDb|MongoDb)"]
         end
 
         subgraph ApplicationService
@@ -92,6 +45,7 @@ flowchart TD
             ConfigRepository
             StoreService
             CheckService
+            EventBroker
 
             subgraph CoreDomain
                 ReceiveRecord
@@ -101,7 +55,7 @@ flowchart TD
             end
 
             subgraph IncomingPorts["Ports (in)"]
-                NotificationReceiver
+                SuccessNotificationEndpoint
                 CheckScheduler
             end
 
@@ -112,17 +66,18 @@ flowchart TD
     end
 
     %% Data Flow
-    BatchSystem --> |Sends success notification| EventListeners
-    EventListeners -.-> |Implements| NotificationReceiver
-    NotificationReceiver --> |Pushes SuccessNotificationReceived| StoreService
+    BatchSystem --> |Sends success notification| SuccessNotificationEndpointAdapters
+    SuccessNotificationEndpointAdapters -.-> |Implements| SuccessNotificationEndpoint
+    SuccessNotificationEndpoint --> |Publishes SuccessNotificationReceived| EventBroker
+    EventBroker --> |Subscribes to SuccessNotificationReceived| StoreService
     StoreService --> |Delegates storing| ReceiveRecordService
     ReceiveRecordService --> |Creates| ReceiveRecord
     ReceiveRecordService --> |Delegates writing| ReceiveRecordRepository
-    Config --> |Provides| NotificationReceiver
+    Config --> |Provides| SuccessNotificationEndpoint
     Config --> |Provides| StoreService
     Config --> |Provides| CheckScheduler
-    CheckScheduler --> |Invokes Services| CheckSchedulerAdapters
-    CheckSchedulerAdapters --> |Invokes| CheckService
+    CheckScheduler --> |Publishes CheckScheduled| EventBroker
+    EventBroker --> |Subscribes to CheckScheduled| CheckService
     CheckService --> |Delegates checking| ReceiveRecordService
     ReceiveRecordService --> |Delegates checking| ReceiveRecord
     ReceiveRecord --> |"Check()"| ReceiveRecord
@@ -132,11 +87,39 @@ flowchart TD
     SlackNotifierAdapter --> |POST| SlackAPI
     SlackNotifierAdapter -.-> |Implements| NotificationSender
     CheckService --> |Delegates deletion| ReceiveRecordService
-    ReceiveRecordService --> |Delegates ReceiveRecord deletion| ReceiveRecordRepository
+    ReceiveRecordService --> |Delegates deletion| ReceiveRecordRepository
     DbAdapters -.-> |Implements| ReceiveRecordRepository
     DbAdapters -.-> |Implements| ConfigRepository
-    DbAdapters  --> |SELET/INSERT/UPDATE| DB
+    DbAdapters  --> |SELECT/INSERT/UPDATE| DB
     CheckSchedulerAdapters -.-> |Implements| CheckScheduler
     Config --> |Reads/Writes| ConfigRepository
     ExternalInput ~~~ InAdapters
 ```
+
+1. **Configuration**:
+   - Define expected success notifications using regex patterns.
+   - Specify URLs to check in case of missing notifications.
+   - Configure a schedule for regular checks.
+   - Provide necessary permissions for Slack integration.
+   - Specify channels for sending success messages or failure alerts.
+
+2. **Event-Driven Operations**:
+   - **POST Event**: When a success notification is received, SNA converts it into a `ReceiveRecord` by assigning a unique ID. This record is then posted to the Slack Platform via the `SuccessNotificationEndpointAdapter`.
+   - **Scheduled Event**: On a defined schedule, SNA checks the arrival of all expected notifications and sends alerts if any of them are missing via the `CheckSchedulerAdapter`.
+
+3. **Identity Verification of Notification**:
+   - SNA verifies the identity of success notifications by adding a hash value generated from the following:
+     - Config file of the Slack Platform for the SNA.
+     - Registered name of the target batch process.
+     - Regex pattern of expected success notification for each target batch process.
+   - This identity verification ensures accurate monitoring by avoiding false-positive failure alerts, especially when multiple SNAs are monitoring the same batch process. Each `ReceiveRecord` created from a success notification ensures that the same notification can be correctly identified and verified during checks.
+
+4. **Transformation and Storage**:
+   - Upon receiving a success notification, the system processes it through several stages:
+     - **ID Assignment**: Assigns a unique identifier to create a `ReceiveRecord`.
+     - **Storage**: Stores the `ReceiveRecord` in the configured repository (`Slack Datastore`, `DynamoDB`, `MongoDB`).
+
+5. **Regular Checks**:
+   - The Scheduler triggers regular checks.
+   - The system verifies the stored `ReceiveRecords` to ensure all expected notifications are present.
+   - If any notification is missing, an alert is generated and sent via Slack.
