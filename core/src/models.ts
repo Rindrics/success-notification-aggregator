@@ -1,15 +1,18 @@
 export class ReceiveRecord {
-  id: string;
+  receiveRecordId: string;
   actualMessage: string;
   expectedPattern: string;
+  aggregatorInstanceId: string
 
   constructor(
-    id: string,
+    receiveRecordId: string,
     actualMessage: string,
     expectedPattern: string,
+    aggregatorInstanceId: string,
   ) {
-    this.id = id;
+    this.receiveRecordId = receiveRecordId;
     this.actualMessage = actualMessage;
     this.expectedPattern = expectedPattern;
+    this.aggregatorInstanceId = aggregatorInstanceId;
   }
 }
