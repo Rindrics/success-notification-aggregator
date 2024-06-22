@@ -15,4 +15,9 @@ export class ReceiveRecord {
     this.expectedPattern = expectedPattern;
     this.endpoint = endpoint;
   }
+
+  asExpected(): boolean {
+    const pattern = new RegExp(this.expectedPattern);
+    return pattern.test(this.actualMessage);
+  }
 }
