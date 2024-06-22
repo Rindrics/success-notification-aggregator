@@ -6,13 +6,13 @@ describe("ReceiveRecord", () => {
     const receiveRecordId = "some-id"
     const actualMessage = "some message";
     const expectedPattern = "expected pattern";
-    const aggregatorInstanceId = "another-id"
+    const endpoint = "another-id"
 
-    const record = new ReceiveRecord(receiveRecordId, actualMessage, expectedPattern, aggregatorInstanceId);
+    const record = new ReceiveRecord(receiveRecordId, actualMessage, expectedPattern, endpoint);
 
     expect(record.receiveRecordId).toBe(receiveRecordId);
     expect(record.actualMessage).toBe(actualMessage);
     expect(record.expectedPattern).toBe(expectedPattern);
-    expect(record.aggregatorInstanceId).toBe(aggregatorInstanceId);
+    expect(record.endpoint).toBe(endpoint);
   });
 });
