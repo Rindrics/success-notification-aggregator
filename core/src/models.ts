@@ -2,7 +2,7 @@ export class ReceiveRecord {
   receiveRecordId: string;
   actualMessage: string;
   expectedPattern: string;
-  endpoint: string
+  endpoint: string;
 
   constructor(
     receiveRecordId: string,
