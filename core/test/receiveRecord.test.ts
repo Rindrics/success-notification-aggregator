@@ -3,21 +3,24 @@ import { ReceiveRecord } from "../src/models";
 describe("ReceiveRecord", () => {
   it("should create a valid ReceiveRecord", () => {
     const receiveRecordId = "some-id";
+    const baseUrlHash = "some-hash";
+    const endpoint = "some-endpoint";
     const actualMessage = "some message";
     const expectedPattern = "expected pattern";
-    const endpoint = "another-id";
 
     const record = new ReceiveRecord(
       receiveRecordId,
+      baseUrlHash,
+      endpoint,
       actualMessage,
       expectedPattern,
-      endpoint,
     );
 
     expect(record.receiveRecordId).toBe(receiveRecordId);
+    expect(record.baseUrlHash).toBe(baseUrlHash);
+    expect(record.endpoint).toBe(endpoint);
     expect(record.actualMessage).toBe(actualMessage);
     expect(record.expectedPattern).toBe(expectedPattern);
-    expect(record.endpoint).toBe(endpoint);
   });
 
   it("return true if its actual message matches with expected pattern", () => {
@@ -25,13 +28,15 @@ describe("ReceiveRecord", () => {
     const willMatchActualMessage = "some message";
 
     const receiveRecordId = "some-id";
-    const endpoint = "another-id";
+    const baseUrlHash = "some-hash";
+    const endpoint = "some-endpoint";
 
     const record = new ReceiveRecord(
       receiveRecordId,
+      baseUrlHash,
+      endpoint,
       willMatchActualMessage,
       expectedPattern,
-      endpoint,
     );
     expect(record.asExpected()).toBe(true);
   });
@@ -41,13 +46,15 @@ describe("ReceiveRecord", () => {
     const wontMatchActualMessage = "some message that wont match";
 
     const receiveRecordId = "some-id";
-    const endpoint = "another-id";
+    const baseUrlHash = "some-hash";
+    const endpoint = "some-endpoint";
 
     const record = new ReceiveRecord(
       receiveRecordId,
+      baseUrlHash,
+      endpoint,
       wontMatchActualMessage,
       expectedPattern,
-      endpoint,
     );
     expect(record.asExpected()).toBe(false);
   });

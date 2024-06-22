@@ -1,19 +1,22 @@
 export class ReceiveRecord {
   receiveRecordId: string;
+  baseUrlHash: string;
+  endpoint: string;
   actualMessage: string;
   expectedPattern: string;
-  endpoint: string;
 
   constructor(
     receiveRecordId: string,
+    baseUrlHash: string,
+    endpoint: string,
     actualMessage: string,
     expectedPattern: string,
-    endpoint: string,
   ) {
     this.receiveRecordId = receiveRecordId;
+    this.baseUrlHash = baseUrlHash;
+    this.endpoint = endpoint;
     this.actualMessage = actualMessage;
     this.expectedPattern = expectedPattern;
-    this.endpoint = endpoint;
   }
 
   asExpected(): boolean {
