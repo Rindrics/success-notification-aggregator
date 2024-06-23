@@ -22,7 +22,7 @@ success-notice-aggregator (SNA) is designed to solve this problem by consolidati
 ```mermaid
 flowchart LR
     subgraph ExternalInput
-        BatchSystem[Monitor Target]
+        BatchSystem[Watched Process]
     end
     subgraph ExternalOutput
         SlackAPI[Slack API]
@@ -110,8 +110,8 @@ flowchart LR
 3. **Identity Verification of Notification**:
    - SNA verifies the identity of success notifications by adding a hash value generated from the following:
      - Config file of the Slack Platform for the SNA.
-     - Registered name of the target batch process.
-     - Regex pattern of expected success notification for each target batch process.
+     - Registered name of the watched batch process.
+     - Regex pattern of expected success notification for each watched batch process.
    - This identity verification ensures accurate monitoring by avoiding false-positive failure alerts, especially when multiple SNAs are monitoring the same batch process. Each `ReceiveRecord` created from a success notification ensures that the same notification can be correctly identified and verified during checks.
 
 4. **Transformation and Storage**:
