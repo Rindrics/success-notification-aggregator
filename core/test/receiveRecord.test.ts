@@ -4,21 +4,21 @@ describe("ReceiveRecord", () => {
   it("should create a valid ReceiveRecord", () => {
     const receiveRecordId = "some-id";
     const baseUrlHash = "some-hash";
-    const endpoint = "some-endpoint";
+    const watchedProcess = "processA";
     const actualMessage = "some message";
     const expectedPattern = "expected pattern";
 
     const record = new ReceiveRecord(
       receiveRecordId,
       baseUrlHash,
-      endpoint,
+      watchedProcess,
       actualMessage,
       expectedPattern,
     );
 
     expect(record.receiveRecordId).toBe(receiveRecordId);
     expect(record.baseUrlHash).toBe(baseUrlHash);
-    expect(record.endpoint).toBe(endpoint);
+    expect(record.watchedProcess).toBe(watchedProcess);
     expect(record.actualMessage).toBe(actualMessage);
     expect(record.expectedPattern).toBe(expectedPattern);
   });
@@ -29,12 +29,12 @@ describe("ReceiveRecord", () => {
 
     const receiveRecordId = "some-id";
     const baseUrlHash = "some-hash";
-    const endpoint = "some-endpoint";
+    const watchedProcess = "processA";
 
     const record = new ReceiveRecord(
       receiveRecordId,
       baseUrlHash,
-      endpoint,
+      watchedProcess,
       willMatchActualMessage,
       expectedPattern,
     );
@@ -47,12 +47,12 @@ describe("ReceiveRecord", () => {
 
     const receiveRecordId = "some-id";
     const baseUrlHash = "some-hash";
-    const endpoint = "some-endpoint";
+    const watchedProcess = "processA";
 
     const record = new ReceiveRecord(
       receiveRecordId,
       baseUrlHash,
-      endpoint,
+      watchedProcess,
       wontMatchActualMessage,
       expectedPattern,
     );

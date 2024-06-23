@@ -17,19 +17,19 @@ class MockReceiveRecordRepository implements ReceiveRecordRepository {
 describe("ReceiveRecordService", () => {
   it("should check all receive records are as expected", async () => {
     const baseUrlHash = "some-hash";
-    const usedEndpoints = ["endpointA", "endpointB"];
+    const watchedProcesses = ["processA", "processB"];
     const receiveRecords = [
       new ReceiveRecord(
         "1",
         baseUrlHash,
-        usedEndpoints[0],
+        watchedProcesses[0],
         "expected message",
         "expected message",
       ),
       new ReceiveRecord(
         "2",
         baseUrlHash,
-        usedEndpoints[1],
+        watchedProcesses[1],
         "expected message",
         "expected message",
       ),
@@ -38,19 +38,22 @@ describe("ReceiveRecordService", () => {
     const repository = new MockReceiveRecordRepository(receiveRecords);
     const receiveRecordService = new ReceiveRecordService(repository);
 
-    const result = await receiveRecordService.check(baseUrlHash, usedEndpoints);
+    const result = await receiveRecordService.check(
+      baseUrlHash,
+      watchedProcesses,
+    );
 
     expect(result).toStrictEqual([]);
   });
 
   it("should return false if any receive record have not been arrived", async () => {
     const baseUrlHash = "some-hash";
-    const usedEndpoints = ["endpointA", "endpointB"];
+    const watchedProcesses = ["processA", "processB"];
     const receiveRecords = [
       new ReceiveRecord(
         "1",
         baseUrlHash,
-        usedEndpoints[0],
+        watchedProcesses[0],
         "expected message",
         "^expected.+",
       ),
@@ -59,26 +62,29 @@ describe("ReceiveRecordService", () => {
     const repository = new MockReceiveRecordRepository(receiveRecords);
     const receiveRecordService = new ReceiveRecordService(repository);
 
-    const result = await receiveRecordService.check(baseUrlHash, usedEndpoints);
+    const result = await receiveRecordService.check(
+      baseUrlHash,
+      watchedProcesses,
+    );
 
-    expect(result).toStrictEqual(["endpointB"]);
+    expect(result).toStrictEqual(["processB"]);
   });
 
   it("should return false if any receive record is not as expected", async () => {
     const baseUrlHash = "some-hash";
-    const usedEndpoints = ["endpointA", "endpointB"];
+    const watchedProcesses = ["processA", "processB"];
     const receiveRecords = [
       new ReceiveRecord(
         "1",
         baseUrlHash,
-        usedEndpoints[0],
+        watchedProcesses[0],
         "unexpected message",
         "^expected.+",
       ),
       new ReceiveRecord(
         "2",
         baseUrlHash,
-        usedEndpoints[1],
+        watchedProcesses[1],
         "expected another message",
         "^expected another .+",
       ),
@@ -87,21 +93,24 @@ describe("ReceiveRecordService", () => {
     const repository = new MockReceiveRecordRepository(receiveRecords);
     const receiveRecordService = new ReceiveRecordService(repository);
 
-    const result = await receiveRecordService.check(baseUrlHash, usedEndpoints);
+    const result = await receiveRecordService.check(
+      baseUrlHash,
+      watchedProcesses,
+    );
 
-    expect(result).toStrictEqual(["endpointA"]);
+    expect(result).toStrictEqual(["processA"]);
   });
 
   it("should throw an error if no receive records are found", async () => {
     const baseUrlHash = "some-hash";
-    const usedEndpoints = ["endpointA", "endpointB"];
+    const watchedProcesses = ["processA", "processB"];
     const receiveRecords: ReceiveRecord[] = [];
 
     const repository = new MockReceiveRecordRepository(receiveRecords);
     const receiveRecordService = new ReceiveRecordService(repository);
 
     await expect(
-      receiveRecordService.check(baseUrlHash, usedEndpoints),
+      receiveRecordService.check(baseUrlHash, watchedProcesses),
     ).rejects.toThrow(
       `ReceiveRecord with base URL hash ${baseUrlHash} not found`,
     );

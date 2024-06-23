@@ -9,7 +9,7 @@ export class ReceiveRecordService {
 
   async check(
     baseUrlHash: string,
-    expectedEndpoints: string[],
+    watchedProcesses: string[],
   ): Promise<string[]> {
     const receiveRecords = await this.repository.getByBaseUrlHash(baseUrlHash);
     if (!receiveRecords || receiveRecords.length === 0) {
@@ -18,14 +18,16 @@ export class ReceiveRecordService {
       );
     }
 
-    const receivedEndpoints = receiveRecords.map((record) => record.endpoint);
-    const missingEndpoints = expectedEndpoints.filter(
-      (service) => !receivedEndpoints.includes(service),
+    const receivedWatchedProcesses = receiveRecords.map(
+      (record) => record.watchedProcess,
     );
-    const failedEndpoints = receiveRecords
+    const missingWathedProcesses = watchedProcesses.filter(
+      (watchedProcess) => !receivedWatchedProcesses.includes(watchedProcess),
+    );
+    const failedWathedProcesses = receiveRecords
       .filter((record) => !record.asExpected())
-      .map((record) => record.endpoint);
+      .map((record) => record.watchedProcess);
 
-    return [...missingEndpoints, ...failedEndpoints];
+    return [...missingWathedProcesses, ...failedWathedProcesses];
   }
 }

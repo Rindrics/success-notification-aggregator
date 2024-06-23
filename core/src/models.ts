@@ -1,20 +1,20 @@
 export class ReceiveRecord {
   receiveRecordId: string;
   baseUrlHash: string;
-  endpoint: string;
+  watchedProcess: string;
   actualMessage: string;
   expectedPattern: string;
 
   constructor(
     receiveRecordId: string,
     baseUrlHash: string,
-    endpoint: string,
+    watchedProcess: string,
     actualMessage: string,
     expectedPattern: string,
   ) {
     this.receiveRecordId = receiveRecordId;
     this.baseUrlHash = baseUrlHash;
-    this.endpoint = endpoint;
+    this.watchedProcess = watchedProcess;
     this.actualMessage = actualMessage;
     this.expectedPattern = expectedPattern;
   }
