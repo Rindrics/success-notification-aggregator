@@ -1,4 +1,3 @@
-import { ReceiveRecord } from "models";
 import { ReceiveRecordRepository } from "interfaces";
 
 export class ReceiveRecordService {
