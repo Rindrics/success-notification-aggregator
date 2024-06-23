@@ -7,7 +7,10 @@ export class ReceiveRecordService {
     this.repository = repository;
   }
 
-  async check(baseUrlHash: string): Promise<string[]> {
+  async check(
+    baseUrlHash: string,
+    expectedEndpoints: string[],
+  ): Promise<string[]> {
     const receiveRecords = await this.repository.getByBaseUrlHash(baseUrlHash);
     if (!receiveRecords || receiveRecords.length === 0) {
       throw new Error(
@@ -15,10 +18,14 @@ export class ReceiveRecordService {
       );
     }
 
+    const receivedEndpoints = receiveRecords.map((record) => record.endpoint);
+    const missingEndpoints = expectedEndpoints.filter(
+      (service) => !receivedEndpoints.includes(service),
+    );
     const failedEndpoints = receiveRecords
       .filter((record) => !record.asExpected())
       .map((record) => record.endpoint);
 
-    return failedEndpoints;
+    return [...missingEndpoints, ...failedEndpoints];
   }
 }
