@@ -8,11 +8,18 @@ export class ReceiveRecordService {
     this.repository = repository;
   }
 
-  async check(baseUrlHash: string): Promise<boolean> {
+  async check(baseUrlHash: string): Promise<string[]> {
     const receiveRecords = await this.repository.getByBaseUrlHash(baseUrlHash);
     if (!receiveRecords || receiveRecords.length === 0) {
-      return false;
+      throw new Error(
+        `ReceiveRecord with base URL hash ${baseUrlHash} not found`,
+      );
     }
-    return receiveRecords.every((receiveRecord) => receiveRecord.asExpected());
+
+    const failedEndpoints = receiveRecords
+      .filter((record) => !record.asExpected())
+      .map((record) => record.endpoint);
+
+    return failedEndpoints;
   }
 }

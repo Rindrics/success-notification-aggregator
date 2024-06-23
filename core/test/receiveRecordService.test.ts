@@ -39,7 +39,7 @@ describe("ReceiveRecordService", () => {
 
     const result = await receiveRecordService.check(baseUrlHash);
 
-    expect(result).toBe(true);
+    expect(result).toStrictEqual([]);
   });
 
   it("should return false if any receive record is not as expected", async () => {
@@ -66,7 +66,7 @@ describe("ReceiveRecordService", () => {
 
     const result = await receiveRecordService.check(baseUrlHash);
 
-    expect(result).toBe(false);
+    expect(result).toStrictEqual(["endpointA"]);
   });
 
   it("should throw an error if no receive records are found", async () => {
@@ -76,8 +76,8 @@ describe("ReceiveRecordService", () => {
     const repository = new MockReceiveRecordRepository(receiveRecords);
     const receiveRecordService = new ReceiveRecordService(repository);
 
-    const result = await receiveRecordService.check(baseUrlHash);
-
-    expect(result).toBe(false);
+    await expect(receiveRecordService.check(baseUrlHash)).rejects.toThrow(
+      `ReceiveRecord with base URL hash ${baseUrlHash} not found`,
+    );
   });
 });
