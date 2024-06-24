@@ -5,11 +5,8 @@ on:
     branches:
       - main
 
-env:
-  WORKDIR_CORE: core
-
 jobs:
   cd-core:
     uses: ./.github/workflows/_cd.yml
     with:
-      working-directory: ${{ env.WORKDIR_CORE }}
+      working-directory: core
