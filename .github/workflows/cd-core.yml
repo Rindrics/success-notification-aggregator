@@ -10,3 +10,4 @@ jobs:
     uses: ./.github/workflows/_cd.yml
     with:
       working-directory: core
+      update-versions-in: '[{"file": "core/package.json"}]'

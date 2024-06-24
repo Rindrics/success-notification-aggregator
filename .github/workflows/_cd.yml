@@ -7,6 +7,10 @@ on:
         type: string
         description: directory to run commands
         required: true
+      update-versions-in:
+        type: string
+        description: "parameter to pass to 'intelygenz/monorepo-tagger-action'"
+        required: true
 
 jobs:
   check:
@@ -27,9 +31,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create pull request with incremented tag
-        id: run-tagpr
-        uses: Songmu/tagpr@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ${{ inputs.working-directory }}
+      - name: Generate a release
+        uses: intelygenz/monorepo-tagger-action@v2.0.2
+        with:
+           mode: 'component'
+           type: 'release'
+           component-prefix: "${{ inputs.working-directory }}-"
+           update-versions-in: ${{ inputs.update-versions-in }}
+           commit-message: "Update release tag for 'core'"
+           commit-author: "github-actions[bot]"
+           commit-author-email: "github-actions[bot]@users.noreply.github.com"
+
