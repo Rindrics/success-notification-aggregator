@@ -6,6 +6,10 @@ TEST_CMD := pnpm test
 
 .PHONY: check format test
 
+.PHONY: install
+install:
+	pnpm install
+
 .PHONY: check
 check:
 	$(PRETTIER) --check .

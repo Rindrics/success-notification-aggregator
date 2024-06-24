@@ -20,6 +20,20 @@ jobs:
         with:
           sparse-checkout: ${{ env.WORKING_DIRECTORY }}
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ env.WORKING_DIRECTORY }}/.node-version
+          cache: 'pnpm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: make install
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
       - name: Lint & format
         run: |
           make check
