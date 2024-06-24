@@ -10,31 +10,7 @@ env:
   WORKING_DIRECTORY: core
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          sparse-checkout: ${{ env.WORKING_DIRECTORY }}
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ${{ env.WORKING_DIRECTORY }}/.node-version
-          cache: 'pnpm'
-          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: make install
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-
-      - name: Lint & format
-        run: |
-          make check
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+  check-core:
+    uses: ./.github/workflows/_check.yml
+    with:
+      working-directory: ${{ env.WORKING_DIRECTORY }}

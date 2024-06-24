@@ -1,0 +1,19 @@
+name: Bump Semantic Version
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+  cd-core:
+    uses: ./.github/workflows/_cd.yml
+    with:
+      working-directory: core
+      update-versions-in: '[{"file": "core/package.json"}]'
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
