@@ -35,15 +35,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate a release
-        uses: intelygenz/monorepo-tagger-action@v2.0.2
-        with:
-           mode: 'component'
-           type: 'release'
-           component-prefix: "${{ inputs.working-directory }}-"
-           update-versions-in: ${{ inputs.update-versions-in }}
-           commit-message: "Update release tag for 'core'"
-           commit-author: "github-actions[bot]"
-           commit-author-email: "github-actions[bot]@users.noreply.github.com"
+        uses: Rindrics/tagpr@monorepo
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          TAGPR_CONFIG_PATH: "${{ inputs.working-directory }}/.tagpr"
 
