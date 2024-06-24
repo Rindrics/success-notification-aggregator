@@ -1,0 +1,26 @@
+name: "[core] Check module"
+
+on:
+  pull_request:
+    paths:
+      core
+      !core/**.md
+
+env:
+  WORKING_DIRECTORY: core
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Lint & format
+        run: |
+          make check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
