@@ -1,11 +1,26 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
+import tsparser from "@typescript-eslint/parser";
 
 export default [
   {
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs"],
+    ignores: ["./babel.config.cjs"],
     languageOptions: {
-      globals: globals.node,
+      parser: tsparser,
+      parserOptions: {
+        project: "./tsconfig.json",
+      },
+      globals: {
+        ...globals.node,
+        module: "readonly",
+        exports: "readonly",
+      },
+    },
+    rules: {
+      "no-console": "warn",
+      "prefer-const": "error",
     },
   },
   {

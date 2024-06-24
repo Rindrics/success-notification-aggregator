@@ -5,3 +5,4 @@ package
 .log/
 node_modules
 coverage
+.tool-versions
