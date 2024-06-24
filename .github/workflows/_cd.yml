@@ -11,6 +11,9 @@ on:
         type: string
         description: "parameter to pass to 'intelygenz/monorepo-tagger-action'"
         required: true
+    secrets:
+      TOKEN:
+        required: true
 
 jobs:
   check:
@@ -41,4 +44,6 @@ jobs:
            commit-message: "Update release tag for 'core'"
            commit-author: "github-actions[bot]"
            commit-author-email: "github-actions[bot]@users.noreply.github.com"
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
 

@@ -15,3 +15,5 @@ jobs:
     with:
       working-directory: core
       update-versions-in: '[{"file": "core/package.json"}]'
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
