@@ -37,7 +37,7 @@
 #       Label of minor update targets. Default is [minor]
 #
 [tagpr]
-	vPrefix = false
+	vPrefix = core
 	releaseBranch = main
         release = false
 	versionFile = package.json
