@@ -1,0 +1,35 @@
+name: Workflow for bumpng semantic version
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        type: string
+        description: directory to run commands
+        required: true
+
+jobs:
+  check:
+    uses: ./.github/workflows/_check.yml
+    with:
+      working-directory: ${{ inputs.working-directory }}
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create pull request with incremented tag
+        id: run-tagpr
+        uses: Songmu/tagpr@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ inputs.working-directory }}
