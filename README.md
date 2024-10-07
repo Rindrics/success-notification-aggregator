@@ -26,18 +26,18 @@ flowchart LR
     end
     subgraph ExternalOutput
         SlackAPI[Slack API]
-        DB[("SlackDatastore\nDynamoDB\nMongoDB\n")]
+        DB[("SlackDatastore|DynamoDB|Cassandra")]
     end
 
     subgraph System
         subgraph InAdapters["Adapters (in)"]
             SuccessNotificationEndpoint["SuccessNotificationEndpoint\n(Slack|AWS|K8s)"]
-            CheckSchedulerAdapters["SchedulerAdapter\n(EventBridge|Slack|Kron)"]
+            CheckSchedulerAdapters["SchedulerAdapter(EventBridge|Slack|Kron)"]
         end
 
         subgraph OutAdapters["Adapters (out)"]
             SlackNotifierAdapter
-            DbAdapters["DbAdapter\n(Slack Datastore|DynamoDb|MongoDb)"]
+            DbAdapters["DbAdapter(Slack Datastore|DynamoDb|Cassandra)"]
         end
 
         subgraph ApplicationService
@@ -117,7 +117,7 @@ flowchart LR
 4. **Transformation and Storage**:
    - Upon receiving a success notification, the system processes it through several stages:
      - **ID Assignment**: Assigns a unique identifier to create a `ReceiveRecord`.
-     - **Storage**: Stores the `ReceiveRecord` in the configured repository (`Slack Datastore`, `DynamoDB`, `MongoDB`).
+     - **Storage**: Stores the `ReceiveRecord` in the configured repository (`Slack Datastore`, `DynamoDB`, `Cassandra`).
 
 5. **Regular Checks**:
    - The Scheduler triggers regular checks.
