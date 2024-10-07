@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "core-0.0.0",
+  "version": "core-0.0.1",
   "description": "",
   "type": "module",
   "scripts": {
